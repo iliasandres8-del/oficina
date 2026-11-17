@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="cielo" cx="50%" cy="18%" r="85%">
+      <stop offset="0" stop-color="#5b1a7a"/>
+      <stop offset=".55" stop-color="#22103f"/>
+      <stop offset="1" stop-color="#0b0718"/>
+    </radialGradient>
+    <linearGradient id="techo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe17a"/>
+      <stop offset="1" stop-color="#ff8a3d"/>
+    </linearGradient>
+    <linearGradient id="izq" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff5f8f"/>
+      <stop offset="1" stop-color="#d6336c"/>
+    </linearGradient>
+    <linearGradient id="der" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8a3dbf"/>
+      <stop offset="1" stop-color="#4a1a7a"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#cielo)"/>
+  <!-- sol a rayas detrás del bloque -->
+  <clipPath id="sol"><circle cx="256" cy="176" r="132"/></clipPath>
+  <g clip-path="url(#sol)" fill="#ff7a45" opacity=".55">
+    <rect x="100" y="44" width="312" height="22"/><rect x="100" y="78" width="312" height="20"/>
+    <rect x="100" y="110" width="312" height="18"/><rect x="100" y="140" width="312" height="15"/>
+    <rect x="100" y="167" width="312" height="12"/><rect x="100" y="191" width="312" height="9"/>
+  </g>
+  <!-- bloque isométrico: la oficina -->
+  <polygon points="256,118 392,196 256,274 120,196" fill="url(#techo)"/>
+  <polygon points="120,196 256,274 256,430 120,352" fill="url(#izq)"/>
+  <polygon points="256,274 392,196 392,352 256,430" fill="url(#der)"/>
+  <!-- ventanas en la cara derecha -->
+  <g fill="#ffd23f" opacity=".9">
+    <polygon points="290,276 322,258 322,284 290,302"/>
+    <polygon points="336,250 368,232 368,258 336,276"/>
+    <polygon points="290,326 322,308 322,334 290,352"/>
+    <polygon points="336,300 368,282 368,308 336,326"/>
+  </g>
+  <!-- botón de play en la cara izquierda -->
+  <polygon points="164,278 164,348 224,313" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/>
+  <!-- filo de luz -->
+  <polyline points="120,196 256,274 392,196" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="5" stroke-linejoin="round"/>
+</svg>
