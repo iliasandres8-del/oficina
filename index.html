@@ -270,18 +270,19 @@ async function pintarAprobar() {
   const v = $("#aprobar");
   $("#n-ok").textContent = clipsOk.length;
   $("#ir-ok").classList.toggle("hay", clipsOk.length > 0);
-  escena3d("jefe", clipsOk.length);
   $("#aviso-ok").hidden = !clipsOk.length;
   if (clipsOk.length) $("#aviso-txt").textContent = clipsOk.length > 1 ? `${clipsOk.length} videos listos` : clipsOk[0].copy?.gancho || "1 video listo";
   const badge = $("#badge"); badge.hidden = !clipsOk.length; badge.textContent = clipsOk.length;
-  if (!clipsOk.length) { v.innerHTML = VACIO("Nada esperando tu OK", "Cuando el Revisor apruebe un clip, aparece aquí para que lo veas antes de publicarlo."); return; }
+  if (!clipsOk.length) { escena3d("jefe", 0); v.innerHTML = VACIO("Nada esperando tu OK", "Cuando el Revisor apruebe un clip, aparece aquí para que lo veas antes de publicarlo."); return; }
   v.innerHTML = "";
+  let primero = "";
   for (const c of clipsOk) {
     const t = document.createElement("article"); t.className = "tarjeta";
     let src = "";
     if (c.preview_path) {
       const { data } = await db.storage.from("oficina").createSignedUrl(c.preview_path, 3600);
       src = data?.signedUrl || "";
+      if (!primero) primero = src;
     }
     t.innerHTML = `${src ? `<video src="${esc(src)}" controls playsinline preload="metadata"></video>` : ""}
       <div class="info"><div class="gancho">${esc(c.copy?.gancho)}</div>
@@ -290,6 +291,7 @@ async function pintarAprobar() {
       <div class="botones"><button class="no" data-id="${c.id}" data-d="descartado">Descartar</button><button class="si" data-id="${c.id}" data-d="aprobado">Aprobar ✓</button></div></div>`;
     v.appendChild(t);
   }
+  escena3d("jefe", clipsOk.length, { gancho: clipsOk[0].copy?.gancho, streamer: clipsOk[0].streamer, url: primero });
 }
 $("#aprobar").addEventListener("click", async (ev) => {
   const b = ev.target.closest("button[data-id]"); if (!b) return;
@@ -380,6 +382,7 @@ db.auth.getSession().then(({ data }) => {
   if (data.session) iniciar(); else $("#entrar").hidden = false;
 });
 </script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module" src="oficina3d.js"></script>
 </body>
 </html>
