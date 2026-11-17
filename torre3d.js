@@ -1,4 +1,4 @@
-// Clip Tower: torre de 5 pisos abierta por delante (como una casa de muñecas). En cada piso trabajan
+// Clips Tower: torre de 5 pisos abierta por delante (como una casa de muñecas). En cada piso trabajan
 // oficinistas de verdad (Quaternius, Ultimate Modular Men/Women, CC0) y un ascensor sube el video
 // de piso en piso hasta la Dirección. La página le habla con window.escena3d (estado, paquete, jefe).
 import * as THREE from "three";
@@ -290,7 +290,7 @@ function puesto({ color, director = false, planta = false }) {
     const t = textura(128, 96, (c, w, h) => {
       c.fillStyle = "#111"; c.fillRect(0, 0, w, h); c.fillStyle = "#fff";
       for (let x = -20; x < w; x += 28) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x + 14, 0); c.lineTo(x + 30, 26); c.lineTo(x + 16, 26); c.fill(); }
-      c.font = "bold 18px sans-serif"; c.fillText("CLIP", 14, 56); c.fillText("TOWER", 14, 82);
+      c.font = "bold 18px sans-serif"; c.fillText("CLIPS", 14, 56); c.fillText("TOWER", 14, 82);
     });
     const claq = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, 0.23), [mOscuro, mOscuro, new THREE.MeshBasicMaterial({ map: t }), mOscuro, mOscuro, mOscuro]);
     claq.position.set(0.45, 0.8, 0.66); claq.rotation.y = -0.3; g.add(claq);
@@ -409,7 +409,7 @@ const TECHO = ALTO;
   const borde2 = caja3(0.07, 0.07, D + 0.1, neon(0xffb03b, 2.4), false); borde2.position.set(W / 2, TECHO, 0); escena.add(borde2);
   const t = textura(1024, 220, (g, w, h) => {
     g.font = "170px 'Bebas Neue', Impact, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
-    g.shadowColor = "#ff4f8b"; g.shadowBlur = 26; g.fillStyle = "#ffe0ec"; g.fillText("CLIP TOWER", w / 2, h / 2 + 8);
+    g.shadowColor = "#ff4f8b"; g.shadowBlur = 26; g.fillStyle = "#ffe0ec"; g.fillText("CLIPS TOWER", w / 2, h / 2 + 8);
   });
   const letrero = new THREE.Group();
   for (const giro of [0, Math.PI]) {

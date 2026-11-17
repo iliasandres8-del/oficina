@@ -1,6 +1,6 @@
 {
-  "name": "Clip Tower",
-  "short_name": "Clip Tower",
+  "name": "Clips Tower",
+  "short_name": "Clips Tower",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0d0620",
