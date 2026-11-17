@@ -58,69 +58,30 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .chip b { min-width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 15px; background: #2a1f48; font-variant-numeric: tabular-nums; }
 .chip.hay b { background: var(--degradado); color: #1a0612; }
 
-/* ---------- la oficina isométrica ---------- */
-.sol { position: absolute; left: 50%; top: 4%; width: min(52vmin, 460px); aspect-ratio: 1; translate: -50% 0; border-radius: 50%;
-  background: linear-gradient(180deg, #ffe17a, #ff7a45 55%, #ff3d7f); opacity: .2; pointer-events: none;
-  -webkit-mask: repeating-linear-gradient(180deg, #000 0 12px, transparent 12px 18px); mask: repeating-linear-gradient(180deg, #000 0 12px, transparent 12px 18px); }
-.estrella { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; opacity: .5; animation: titilar 4s infinite; pointer-events: none; }
-.escenario { position: absolute; left: 50%; top: 54%; width: 0; height: 0; }
-.piso { position: absolute; width: 960px; height: 520px; left: -480px; top: -260px;
-  transform-style: preserve-3d; transform: rotateX(var(--inclinar)) rotateZ(var(--girar));
-  background:
-    linear-gradient(rgba(255, 138, 61, .07) 1px, transparent 1px) 0 0 / 40px 40px,
-    linear-gradient(90deg, rgba(255, 138, 61, .07) 1px, transparent 1px) 0 0 / 40px 40px,
-    linear-gradient(135deg, #22104a, #110828);
-  border: 3px solid #ff5f8f; border-radius: 8px;
-  box-shadow: 0 0 60px rgba(255, 79, 139, .45), inset 0 0 80px rgba(255, 138, 61, .14); }
-.pasillo { position: absolute; left: 120px; top: 130px; width: 690px; height: 250px; border: 3px dashed rgba(255, 210, 63, .28); border-radius: 26px; }
-.sala { position: absolute; width: 180px; height: 180px; transform-style: preserve-3d; }
-.sala .suelo { position: absolute; inset: 0; background: var(--tinte); opacity: .22; border: 1.5px solid var(--linea); border-radius: 4px; }
-.pared { position: absolute; background: linear-gradient(to top, var(--tinte), transparent); border: 1px solid var(--linea); opacity: .4; transition: opacity .4s, box-shadow .4s; }
-.p-atras { left: 0; top: 0; width: 180px; height: 78px; transform-origin: top; transform: rotateX(90deg); }
-.p-izq { left: 0; top: 0; width: 78px; height: 180px; transform-origin: left; transform: rotateY(-90deg);
-  background: linear-gradient(to left, var(--tinte), transparent); filter: brightness(.75); }
-.p-frente { left: 0; top: 180px; width: 180px; height: 78px; transform-origin: top; transform: rotateX(90deg); opacity: .12; }
-.p-der { left: 180px; top: 0; width: 78px; height: 180px; transform-origin: left; transform: rotateY(-90deg); opacity: .12;
-  background: linear-gradient(to left, var(--tinte), transparent); }
-.sala.trabajando .pared { opacity: .85; box-shadow: 0 0 34px var(--linea); }
-.sala.trabajando .suelo { opacity: .5; box-shadow: 0 0 40px var(--linea); }
-.sala.error { --tinte: #ff5470; --linea: #ff8095; }
-
-/* objetos que miran a la cámara (deshacen el giro del piso) */
-.cara { position: absolute; left: 90px; top: 90px; transform-style: preserve-3d; }
-.cara > * { transform: rotateZ(calc(var(--girar) * -1)) rotateX(calc(var(--inclinar) * -1)); transform-origin: bottom center; }
-.etiqueta { position: absolute; left: 50%; bottom: 0; translate: -50% 0; white-space: nowrap;
-  background: rgba(20, 12, 40, .94); border: 1.5px solid var(--linea); border-radius: 999px;
-  padding: 7px 15px; font-weight: 600; font-size: 15px; display: flex; gap: 8px; align-items: center;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .55); }
-.etiqueta i { width: 8px; height: 8px; border-radius: 50%; background: var(--tenue); flex: none; }
-.sala.trabajando .etiqueta { box-shadow: 0 0 22px var(--linea), 0 8px 24px rgba(0, 0, 0, .55); }
-.sala.trabajando .etiqueta i { background: var(--verde); box-shadow: 0 0 10px var(--verde); animation: latir 1s infinite; }
-.sala.error .etiqueta i { background: var(--rojo); }
-.globo { position: absolute; left: 50%; bottom: 48px; translate: -50% 0; max-width: 220px; width: max-content;
-  background: #fff; color: #140a26; border-radius: 12px; padding: 7px 11px; font-size: 12px; font-weight: 600; line-height: 1.3;
-  opacity: 0; transition: opacity .3s; pointer-events: none; box-shadow: 0 8px 20px rgba(0, 0, 0, .4); }
-.globo::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: #fff; translate: -50% 0; rotate: 45deg; border-radius: 2px; }
-.globo:empty { display: none; }
-.sala.trabajando .globo, .sala.error .globo { opacity: 1; }
-.agente { position: absolute; left: 50%; bottom: 0; translate: -50% 0; width: 60px; height: 64px; }
-.agente .pantalla { position: absolute; left: 6px; bottom: 26px; width: 34px; height: 22px; border-radius: 3px;
-  background: #1a1233; border: 2px solid #e6dcff; }
-.sala.trabajando .agente .pantalla { background: var(--linea); box-shadow: 0 0 16px var(--linea); animation: parpadeo .8s infinite alternate; }
-.agente .mesa { position: absolute; left: 0; bottom: 16px; width: 48px; height: 8px; background: #efe6ff; border-radius: 2px; box-shadow: 0 4px 0 #9d8fc4; }
-.agente .cabeza { position: absolute; right: 4px; bottom: 30px; width: 14px; height: 14px; border-radius: 50%; background: #fff1e6; }
-.agente .cuerpo { position: absolute; right: 1px; bottom: 6px; width: 20px; height: 24px; border-radius: 9px 9px 4px 4px; background: var(--linea); }
-.sala.trabajando .agente .cabeza, .sala.trabajando .agente .cuerpo { animation: teclear .35s infinite alternate; }
-
-.paquete { position: absolute; width: 18px; height: 18px; border-radius: 4px; background: var(--amarillo);
-  box-shadow: 0 0 20px var(--amarillo); transition: left 1.4s cubic-bezier(.45, 0, .2, 1), top 1.4s cubic-bezier(.45, 0, .2, 1), opacity .4s;
-  transform: translateZ(20px); }
-.chispa { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #ffd9a8; box-shadow: 0 0 8px #ffb070; animation: titilar 3s infinite; }
+/* ---------- la oficina 3D ---------- */
+.escena-caja canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
+.escena-caja canvas:active { cursor: grabbing; }
+.cargando3d { position: absolute; inset: 0; display: grid; place-items: center; color: var(--suave); font-size: 13px; }
+.rotulos { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.rotulo { position: absolute; left: 0; top: 0; display: grid; justify-items: center; gap: 6px; will-change: transform; }
+.chip3 { display: flex; align-items: center; gap: 6px; white-space: nowrap; background: rgba(20, 12, 40, .9); border: 1.5px solid var(--c); border-radius: 999px;
+  padding: 4px 10px; font-size: 12px; font-weight: 600; box-shadow: 0 6px 18px rgba(0, 0, 0, .45); }
+.chip3 i { width: 7px; height: 7px; border-radius: 50%; background: var(--tenue); flex: none; }
+.rotulo.trabajando .chip3 i { background: var(--verde); box-shadow: 0 0 8px var(--verde); animation: latir 1s infinite; }
+.rotulo.error .chip3 { border-color: var(--rojo); } .rotulo.error .chip3 i { background: var(--rojo); }
+.rotulo.jefe .chip3 { background: var(--degradado); color: #1a0612; border-color: transparent; font-size: 13px; }
+.rotulo.jefe .chip3 i { background: #1a0612; }
+.burbuja { position: relative; max-width: 190px; width: max-content; background: #fff; color: #140a26; border-radius: 11px; padding: 6px 10px;
+  font-size: 11.5px; font-weight: 600; line-height: 1.3; text-align: center; box-shadow: 0 6px 16px rgba(0, 0, 0, .35); }
+.burbuja::after { content: ""; position: absolute; left: 50%; bottom: -4px; width: 9px; height: 9px; background: #fff; translate: -50% 0; rotate: 45deg; border-radius: 2px; }
+.burbuja:empty { display: none; }
+.aviso-ok { position: absolute; top: 12px; left: 50%; translate: -50% 0; z-index: 3; display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100% - 24px);
+  background: rgba(255, 210, 63, .96); color: #1a0612; border-radius: 14px; padding: 7px 7px 7px 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .4); font-size: 13px; }
+.aviso-ok b { white-space: nowrap; } .aviso-ok span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.aviso-ok button { border: 0; background: #1a0612; color: #fff; border-radius: 10px; padding: 7px 12px; font-weight: 700; flex: none; }
+.pista { position: absolute; bottom: 10px; left: 50%; translate: -50% 0; font-size: 11px; color: var(--suave); background: rgba(11, 7, 24, .6); padding: 4px 10px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
 
 @keyframes latir { 50% { opacity: .35; } }
-@keyframes parpadeo { to { filter: brightness(1.5); } }
-@keyframes teclear { to { transform: translateY(-2px); } }
-@keyframes titilar { 50% { opacity: .15; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
 /* ---------- panel lateral ---------- */
@@ -186,11 +147,13 @@ form button[type=submit] { background: var(--degradado); color: #1a0612; border:
   .marca h1 { font-size: 20px; }
   .meta-dia, .chip { padding: 3px; }
   .meta-dia span, .chip span { display: none; }
-  .escena-caja { height: 40vh; min-height: 290px; }
-  .escenario { top: 74%; left: 48%; }
-  .etiqueta { font-size: 30px; padding: 10px 22px; border-width: 2.5px; gap: 12px; }
-  .etiqueta i { width: 14px; height: 14px; }
-  .globo { font-size: 24px; max-width: 380px; bottom: 80px; padding: 10px 16px; }
+  .escena-caja { height: 54vh; min-height: 340px; }
+  .chip3 { font-size: 10.5px; padding: 3px 8px; gap: 5px; }
+  .rotulo:not(.jefe):not(.trabajando):not(.error) .nom { display: none; }
+  .rotulo:not(.jefe):not(.trabajando):not(.error) .chip3 { padding: 3px 6px; }
+  .rotulo.admin .burbuja { display: none; }
+  .rotulo.jefe .chip3 { font-size: 11.5px; }
+  .burbuja { font-size: 10.5px; max-width: 140px; padding: 5px 8px; }
   .lateral { border-left: 0; border-top: 1px solid var(--borde); }
   .vista { padding: 14px 16px calc(24px + env(safe-area-inset-bottom)); }
   .pestanas { margin: 14px 16px 0; }
@@ -210,9 +173,11 @@ form button[type=submit] { background: var(--degradado); color: #1a0612; border:
     </div>
   </header>
 
-  <section class="escena-caja" aria-label="Oficina de agentes">
-    <div class="sol"></div>
-    <div class="escenario"><div class="piso" id="piso"></div></div>
+  <section class="escena-caja" aria-label="Oficina de agentes en 3D">
+    <div class="cargando3d" id="cargando3d">Cargando la oficina…</div>
+    <div class="rotulos" id="rotulos"></div>
+    <div class="aviso-ok" id="aviso-ok" hidden><b>Espera tu OK</b><span id="aviso-txt"></span><button type="button" id="aviso-ver">Ver</button></div>
+    <span class="pista">Arrastra para girar la oficina</span>
   </section>
 
   <aside class="lateral" id="lateral">
@@ -252,76 +217,39 @@ form button[type=submit] { background: var(--degradado); color: #1a0612; border:
 const db = supabase.createClient("https://qzszwuiehdjndzqfbvsw.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6c3p3dWllaGRqbmR6cWZidnN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NzE2MTksImV4cCI6MjEwNTA0NzYxOX0.Suzr4M3EDhczpR_xeH28OomKhrYmNPZA7NABR3nLEdA");
 
-// Salas: posición en el piso (x, y), color e icono. El orden sigue la cadena de trabajo.
+// Equipo en el orden de la cadena de trabajo (color e icono de cada puesto).
 const SALAS = {
-  radar:      { x: 30,  y: 40,  tinte: "#e0a21b", linea: "#ffd23f", icono: "📡" },
-  cortador:   { x: 260, y: 40,  tinte: "#ff7a2f", linea: "#ffa865", icono: "✂️" },
-  copywriter: { x: 490, y: 40,  tinte: "#ff4f5e", linea: "#ff8a94", icono: "✍️" },
-  editor:     { x: 720, y: 40,  tinte: "#ff3d8b", linea: "#ff86b8", icono: "🎬" },
-  revisor:    { x: 720, y: 290, tinte: "#c64bff", linea: "#dc8cff", icono: "🔍" },
-  publicador: { x: 490, y: 290, tinte: "#8a5cff", linea: "#b39bff", icono: "🚀" },
-  biblioteca: { x: 260, y: 290, tinte: "#4f6bff", linea: "#8ea2ff", icono: "🗂️" },
-  analista:   { x: 30,  y: 290, tinte: "#20b8d0", linea: "#6fe2f0", icono: "📊" },
+  radar:      { linea: "#ffd23f", icono: "📡" },
+  cortador:   { linea: "#ffa865", icono: "✂️" },
+  copywriter: { linea: "#ff8a94", icono: "✍️" },
+  editor:     { linea: "#ff86b8", icono: "🎬" },
+  revisor:    { linea: "#dc8cff", icono: "🔍" },
+  publicador: { linea: "#b39bff", icono: "🚀" },
+  biblioteca: { linea: "#8ea2ff", icono: "🗂️" },
+  analista:   { linea: "#6fe2f0", icono: "📊" },
 };
-const SIGUIENTE = { radar: "cortador", cortador: "copywriter", copywriter: "editor", editor: "revisor", revisor: "publicador", publicador: "biblioteca" };
+window.SALAS = SALAS;
+// El Revisor le entrega al Director; lo aprobado sale del Director al Publicador.
+const SIGUIENTE = { radar: "cortador", cortador: "copywriter", copywriter: "editor", editor: "revisor", revisor: "director", publicador: "biblioteca" };
+// Mientras carga la escena 3D, los pedidos se guardan en una cola.
+window.escena3d = { cola: [] };
+for (const f of ["estado", "paquete", "jefe", "admin"]) window.escena3d[f] = (...a) => window.escena3d.cola.push([f, a]);
+const escena3d = (f, ...a) => window.escena3d[f](...a);
 const ICONO_NOTA = { ok: "✅", error: "⚠️", aviso: "💡", info: "📡" };
 const $ = (s) => document.querySelector(s);
 const VACIO = (titulo, texto) => `<div class="vacio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="m3 13 9 5 9-5"/></svg><b>${titulo}</b><span>${texto}</span></div>`;
 const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let agentes = {}, clipsOk = [], meta = 5;
 
-// ---------- construir la oficina ----------
-function construir() {
-  const piso = $("#piso");
-  piso.insertAdjacentHTML("beforeend", '<div class="pasillo"></div>');
-  for (const [id, s] of Object.entries(SALAS)) {
-    const d = document.createElement("div");
-    d.className = "sala"; d.id = "sala-" + id;
-    d.style.cssText = `left:${s.x}px;top:${s.y}px;--tinte:${s.tinte};--linea:${s.linea}`;
-    d.innerHTML = `<div class="suelo"></div><div class="pared p-atras"></div><div class="pared p-izq"></div>
-      <div class="cara"><div class="agente"><div class="mesa"></div><div class="pantalla"></div><div class="cuerpo"></div><div class="cabeza"></div></div></div>
-      <div class="pared p-frente"></div><div class="pared p-der"></div>
-      <div class="cara" style="transform:translateZ(120px)"><div><div class="etiqueta"><i></i><span>${s.icono} <span class="nombre">${id}</span></span></div><div class="globo"></div></div></div>`;
-    piso.appendChild(d);
-  }
-  for (let i = 0; i < 26; i++) {
-    const c = document.createElement("div"); c.className = "chispa";
-    c.style.cssText = `left:${Math.random() * 940}px;top:${Math.random() * 500}px;animation-delay:${Math.random() * 3}s`;
-    piso.appendChild(c);
-  }
-  const caja = $(".escena-caja");
-  for (let i = 0; i < 40; i++) {
-    const e = document.createElement("div"); e.className = "estrella";
-    e.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 4}s`;
-    caja.prepend(e);
-  }
-  ajustar(); addEventListener("resize", ajustar);
-}
-function ajustar() {
-  const caja = $(".escena-caja"), esc = Math.min(caja.clientWidth / 1060, caja.clientHeight / 700, 1.15);
-  $(".escenario").style.transform = `scale(${Math.max(esc, .3)})`;
-}
-
 function pintarAgente(a) {
   agentes[a.id] = a;
-  const sala = $("#sala-" + a.id); if (!sala) return;
-  sala.classList.toggle("trabajando", a.estado === "trabajando");
-  sala.classList.toggle("error", a.estado === "error");
-  sala.querySelector(".nombre").textContent = a.nombre;
-  sala.querySelector(".globo").textContent = a.tarea || (a.estado === "error" ? "Algo falló" : "");
+  escena3d("estado", a.id, a.estado, a.tarea || (a.estado === "error" ? "Algo falló" : ""), a.nombre);
   const n = Object.values(agentes).filter((x) => x.estado === "trabajando").length;
   $("#estado-equipo").classList.toggle("vivo", n > 0);
   $("#estado-equipo span").textContent = n ? `${n} agente${n > 1 ? "s" : ""} trabajando` : "Oficina en calma · próxima vuelta pronto";
 }
 
-function enviarPaquete(desde) {
-  const a = SALAS[desde], b = SALAS[SIGUIENTE[desde]]; if (!a || !b) return;
-  const p = document.createElement("div"); p.className = "paquete";
-  p.style.left = a.x + 82 + "px"; p.style.top = a.y + 82 + "px";
-  $("#piso").appendChild(p);
-  requestAnimationFrame(() => requestAnimationFrame(() => { p.style.left = b.x + 82 + "px"; p.style.top = b.y + 82 + "px"; }));
-  setTimeout(() => { p.style.opacity = 0; setTimeout(() => p.remove(), 500); }, 1500);
-}
+function enviarPaquete(desde) { if (SIGUIENTE[desde]) escena3d("paquete", desde, SIGUIENTE[desde]); }
 
 // ---------- notificaciones ----------
 function hace(f) {
@@ -342,6 +270,9 @@ async function pintarAprobar() {
   const v = $("#aprobar");
   $("#n-ok").textContent = clipsOk.length;
   $("#ir-ok").classList.toggle("hay", clipsOk.length > 0);
+  escena3d("jefe", clipsOk.length);
+  $("#aviso-ok").hidden = !clipsOk.length;
+  if (clipsOk.length) $("#aviso-txt").textContent = clipsOk.length > 1 ? `${clipsOk.length} videos listos` : clipsOk[0].copy?.gancho || "1 video listo";
   const badge = $("#badge"); badge.hidden = !clipsOk.length; badge.textContent = clipsOk.length;
   if (!clipsOk.length) { v.innerHTML = VACIO("Nada esperando tu OK", "Cuando el Revisor apruebe un clip, aparece aquí para que lo veas antes de publicarlo."); return; }
   v.innerHTML = "";
@@ -365,13 +296,15 @@ $("#aprobar").addEventListener("click", async (ev) => {
   b.disabled = true;
   const { error } = await db.from("of_clips").update({ estado: b.dataset.d }).eq("id", b.dataset.id);
   if (error) { alert(error.message); b.disabled = false; return; }
+  if (b.dataset.d === "aprobado") escena3d("paquete", "director", "publicador");
   clipsOk = clipsOk.filter((c) => c.id !== b.dataset.id); pintarAprobar();
 });
 
 // ---------- streamers ----------
 async function cargarFuentes() {
   const { data } = await db.from("of_fuentes").select("*").order("id");
-  const l = $("#lista-fuentes");
+  const l = $("#lista-fuentes"), activos = (data || []).filter((f) => f.activa).length;
+  escena3d("admin", activos ? `${activos} streamer${activos > 1 ? "s" : ""} en la mira` : "Esperando la lista de streamers");
   l.innerHTML = (data || []).length ? "" : VACIO("Sin streamers todavía", "Agrega los streamers de GTA 6 que tengan campaña de clipping.");
   for (const f of data || []) {
     const d = document.createElement("div"); d.className = "fuente" + (f.activa ? "" : " pausa");
@@ -398,6 +331,7 @@ function abrir(id) {
   document.querySelectorAll(".vista").forEach((v) => v.classList.toggle("activa", v.id === id));
 }
 document.querySelectorAll("[role=tab]").forEach((b) => b.addEventListener("click", () => abrir(b.dataset.vista)));
+$("#aviso-ver").addEventListener("click", () => $("#ir-ok").click());
 $("#ir-ok").addEventListener("click", () => { abrir("aprobar"); $("#lateral").scrollIntoView({ behavior: "smooth", block: "start" }); });
 
 // ---------- datos en vivo ----------
@@ -442,10 +376,10 @@ $("#form-entrar").addEventListener("submit", async (ev) => {
   $("#entrar").hidden = true; iniciar();
 });
 
-construir();
 db.auth.getSession().then(({ data }) => {
   if (data.session) iniciar(); else $("#entrar").hidden = false;
 });
 </script>
+<script type="module" src="oficina3d.js"></script>
 </body>
 </html>
