@@ -1,10 +1,10 @@
 {
-  "name": "Leonida Clips · Oficina",
-  "short_name": "Oficina",
+  "name": "Clip Tower",
+  "short_name": "Clip Tower",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0b0718",
-  "theme_color": "#0b0718",
+  "background_color": "#0d0620",
+  "theme_color": "#0d0620",
   "icons": [
     { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icono-512.png", "sizes": "512x512", "type": "image/png" },

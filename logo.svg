@@ -1,44 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <radialGradient id="cielo" cx="50%" cy="18%" r="85%">
+    <radialGradient id="cielo" cx="50%" cy="20%" r="85%">
       <stop offset="0" stop-color="#5b1a7a"/>
       <stop offset=".55" stop-color="#22103f"/>
-      <stop offset="1" stop-color="#0b0718"/>
+      <stop offset="1" stop-color="#0d0620"/>
     </radialGradient>
     <linearGradient id="techo" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffe17a"/>
-      <stop offset="1" stop-color="#ff8a3d"/>
-    </linearGradient>
-    <linearGradient id="izq" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ff5f8f"/>
-      <stop offset="1" stop-color="#d6336c"/>
-    </linearGradient>
-    <linearGradient id="der" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8a3dbf"/>
-      <stop offset="1" stop-color="#4a1a7a"/>
+      <stop offset="0" stop-color="#ffb03b"/>
+      <stop offset="1" stop-color="#ff4f8b"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="112" fill="url(#cielo)"/>
-  <!-- sol a rayas detrás del bloque -->
-  <clipPath id="sol"><circle cx="256" cy="176" r="132"/></clipPath>
-  <g clip-path="url(#sol)" fill="#ff7a45" opacity=".55">
-    <rect x="100" y="44" width="312" height="22"/><rect x="100" y="78" width="312" height="20"/>
-    <rect x="100" y="110" width="312" height="18"/><rect x="100" y="140" width="312" height="15"/>
-    <rect x="100" y="167" width="312" height="12"/><rect x="100" y="191" width="312" height="9"/>
+  <ellipse cx="256" cy="440" rx="150" ry="34" fill="#ff4f8b" opacity=".22"/>
+  <!-- torre: cara izquierda, cara derecha, techo -->
+  <polygon points="150,150 256,211 256,452 150,391" fill="#2a1650"/>
+  <polygon points="256,211 362,150 362,391 256,452" fill="#1b0d38"/>
+  <polygon points="256,89 362,150 256,211 150,150" fill="url(#techo)"/>
+  <!-- pisos y ventanas encendidas -->
+  <g fill="#ffd23f">
+    <polygon points="164,190 192,206 192,240 164,224"/><polygon points="206,214 242,235 242,269 206,248"/>
+    <polygon points="270,235 306,214 306,248 270,269"/><polygon points="320,206 348,190 348,224 320,240"/>
   </g>
-  <!-- bloque isométrico: la oficina -->
-  <polygon points="256,118 392,196 256,274 120,196" fill="url(#techo)"/>
-  <polygon points="120,196 256,274 256,430 120,352" fill="url(#izq)"/>
-  <polygon points="256,274 392,196 392,352 256,430" fill="url(#der)"/>
-  <!-- ventanas en la cara derecha -->
-  <g fill="#ffd23f" opacity=".9">
-    <polygon points="290,276 322,258 322,284 290,302"/>
-    <polygon points="336,250 368,232 368,258 336,276"/>
-    <polygon points="290,326 322,308 322,334 290,352"/>
-    <polygon points="336,300 368,282 368,308 336,326"/>
+  <g fill="#ff8a94">
+    <polygon points="164,256 192,272 192,306 164,290"/><polygon points="206,280 242,301 242,335 206,314"/>
+    <polygon points="270,301 306,280 306,314 270,335"/><polygon points="320,272 348,256 348,290 320,306"/>
   </g>
-  <!-- botón de play en la cara izquierda -->
-  <polygon points="164,278 164,348 224,313" fill="#fff" stroke="#fff" stroke-width="8" stroke-linejoin="round"/>
-  <!-- filo de luz -->
-  <polyline points="120,196 256,274 392,196" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="5" stroke-linejoin="round"/>
+  <g fill="#b39bff" opacity=".55">
+    <polygon points="164,322 192,338 192,372 164,356"/><polygon points="206,346 242,367 242,401 206,380"/>
+    <polygon points="270,367 306,346 306,380 270,401"/><polygon points="320,338 348,322 348,356 320,372"/>
+  </g>
+  <!-- estrella de Dirección -->
+  <polygon points="256,118 266,140 290,142 272,157 278,180 256,168 234,180 240,157 222,142 246,140" fill="#fff"/>
+  <polyline points="150,150 256,211 362,150" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="5" stroke-linejoin="round"/>
 </svg>
