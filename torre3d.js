@@ -328,6 +328,10 @@ const EQUIPO = {
   admin:      { modelo: "M", traje: 0x111116, camisa: 0xfdf6ee, piel: 0xd4a07a, pelo: 0x150d0a, rizos: "largo" },
 };
 
+// nombres que se ven en las placas
+const NOMBRES = { radar: "Radar", biblioteca: "Biblioteca", cortador: "Cortador", copywriter: "Copywriter", editor: "Editor", revisor: "Revisor",
+  publicador: "Publicador", analista: "Analista", director: "Andrés", admin: "Yareidys" };
+
 // ---------- los pisos ----------
 const puestos = {}, pisos = [];
 const ventanaTex = textura(256, 128, (g, w, h) => {
@@ -384,11 +388,14 @@ PISOS.forEach((info, i) => {
     p.g.position.set(sitios[k][0], 0, sitios[k][1]); p.g.rotation.y = Math.PI / 4;
     p.def = EQUIPO[id]; p.piso = i; piso.add(p.g); puestos[id] = p;
   });
-  // rótulo HTML del piso
-  const ancla = new THREE.Object3D(); ancla.position.set(-W / 2, H * 0.62, D / 2); piso.add(ancla);
-  const el = document.createElement("div"); el.className = "piso-rotulo" + (esJefe ? " jefe" : "");
+  // placa del piso (HTML), unida a la torre con una línea
+  const ancla = new THREE.Object3D(); ancla.position.set(-W / 2, H * 0.55, D / 2); piso.add(ancla);
+  const el = document.createElement("div"); el.className = "placa" + (esJefe ? " jefe" : "");
   el.style.setProperty("--c", info.color);
-  el.innerHTML = `<div class="piso-chip"><span>${info.icono}</span><span>${info.nombre}</span><span class="puntos">${info.agentes.map(() => "<i></i>").join("")}</span></div><div class="piso-burbuja"></div>`;
+  const caras = info.agentes.map((id) => `<i style="--fondo-cara:#${new THREE.Color(EQUIPO[id].traje).lerp(new THREE.Color(info.color), 0.55).getHexString()}" title="${NOMBRES[id]}">${NOMBRES[id][0]}</i>`).join("");
+  el.innerHTML = `<div class="num">${String(i + 1).padStart(2, "0")}</div><div class="cuerpo"><div class="fila"><div class="nombre">${info.nombre}</div><span class="caras">${caras}</span></div>`
+    + `<span class="que">${esJefe ? "Andrés y Yareidys" : "En espera"}</span>`
+    + (esJefe ? `<span class="ir">Ver en tu mesa →</span>` : "") + `</div><span class="guia"></span>`;
   if (esJefe) el.addEventListener("click", () => { location.hash = "director"; });
   capa.appendChild(el);
   pisos.push({ info, piso, mTecho, luz, pv, el, ancla, esJefe });
@@ -468,18 +475,25 @@ const tareas = {};
 let pendientes = 0;
 function pintarPiso(pz) {
   const ids = pz.info.agentes;
-  pz.el.querySelectorAll(".puntos i").forEach((d, k) => {
+  pz.el.querySelectorAll(".caras i").forEach((d, k) => {
     const e = puestos[ids[k]]?.estado;
     d.className = e === "trabajando" ? "on" : e === "error" ? "mal" : "";
   });
   if (pz.esJefe) return;
-  const activo = ids.find((id) => puestos[id]?.estado !== "libre" && tareas[id]);
-  pz.el.querySelector(".piso-burbuja").textContent = activo ? tareas[activo] : "";
+  const que = pz.el.querySelector(".que");
+  const malo = ids.find((id) => puestos[id]?.estado === "error");
+  const activo = ids.find((id) => puestos[id]?.estado === "trabajando");
+  pz.el.classList.toggle("falla", !!malo && !activo);
+  pz.el.classList.toggle("activa", !!activo);
+  if (activo) que.innerHTML = `<b>${NOMBRES[activo]}</b> · ${tareas[activo] || "trabajando"}`;
+  else que.textContent = malo ? `${NOMBRES[malo]} tuvo un error` : "En espera";
+  que.title = que.textContent;
+  pz.ancho = 0;
 }
 const api = {
   estado(id, estado, tarea, nombre) {
     const p = puestos[id]; if (!p) return;
-    p.estado = estado; tareas[id] = estado === "libre" ? "" : `${nombre || id}: ${tarea || "trabajando"}`;
+    p.estado = estado; tareas[id] = estado === "libre" ? "" : (tarea || "trabajando").replace(/^./, (c) => c.toLowerCase());
     pintarPiso(pisos[p.piso]);
   },
   paquete(desde, hasta) {
@@ -494,7 +508,9 @@ const api = {
     pendientes = n;
     dir.estado = n ? "trabajando" : "libre"; puestos.admin.estado = n ? "trabajando" : "libre";
     const pz = pisos[dir.piso];
-    pz.el.querySelector(".piso-burbuja").textContent = n ? `Tienes ${n} video${n > 1 ? "s" : ""} por aprobar · tócame` : "";
+    pz.el.classList.toggle("pendiente", n > 0);
+    pz.el.querySelector(".que").textContent = n ? `${n} video${n > 1 ? "s" : ""} espera${n > 1 ? "n" : ""} tu OK` : "Andrés y Yareidys";
+    pz.ancho = 0;
     pintarPiso(pz);
     pintarJefe(n, clip.gancho, clip.streamer);
     const pv = jefePantalla.getObjectByName("video");
@@ -527,7 +543,7 @@ function medir() {
   Wp = caja.clientWidth; Hp = caja.clientHeight; if (!Wp || !Hp) return;
   render.setSize(Wp, Hp, false); compositor.setSize(Wp, Hp); brillo.resolution.set(Wp / 2, Hp / 2);
   camara.aspect = Wp / Hp;
-  camara.setViewOffset(Wp, Hp, -Wp * (Wp < 600 ? 0.07 : 0.04), 0, Wp, Hp);   // corre la torre a la derecha: deja sitio a los rótulos
+  camara.setViewOffset(Wp, Hp, -Wp * (Wp < 600 ? 0.12 : 0.04), 0, Wp, Hp);   // corre la torre a la derecha: deja sitio a los rótulos
   camara.updateProjectionMatrix();
   const t = Math.tan(THREE.MathUtils.degToRad(camara.fov / 2));
   dist = Math.max((TECHO + 5.5) / 2 / t, 5.6 / (t * camara.aspect));
@@ -590,7 +606,7 @@ function cuadro() {
   for (const pz of pisos) {
     pz.ancla.getWorldPosition(v); v.project(camara);
     pz.ancho ||= pz.el.offsetWidth;
-    const x = Math.max(8, (v.x * 0.5 + 0.5) * Wp - pz.ancho + 26), y = (-v.y * 0.5 + 0.5) * Hp;
+    const x = Math.max(8, (v.x * 0.5 + 0.5) * Wp - pz.ancho - 22), y = (-v.y * 0.5 + 0.5) * Hp;
     pz.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(0, -50%)`;
     pz.el.style.opacity = entrada < 0.85 ? 0 : 1;
   }
