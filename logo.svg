@@ -1,35 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <radialGradient id="cielo" cx="50%" cy="20%" r="85%">
-      <stop offset="0" stop-color="#5b1a7a"/>
-      <stop offset=".55" stop-color="#22103f"/>
-      <stop offset="1" stop-color="#0d0620"/>
-    </radialGradient>
-    <linearGradient id="techo" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffb03b"/>
-      <stop offset="1" stop-color="#ff4f8b"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="112" fill="url(#cielo)"/>
-  <ellipse cx="256" cy="440" rx="150" ry="34" fill="#ff4f8b" opacity=".22"/>
-  <!-- torre: cara izquierda, cara derecha, techo -->
-  <polygon points="150,150 256,211 256,452 150,391" fill="#2a1650"/>
-  <polygon points="256,211 362,150 362,391 256,452" fill="#1b0d38"/>
-  <polygon points="256,89 362,150 256,211 150,150" fill="url(#techo)"/>
-  <!-- pisos y ventanas encendidas -->
-  <g fill="#ffd23f">
-    <polygon points="164,190 192,206 192,240 164,224"/><polygon points="206,214 242,235 242,269 206,248"/>
-    <polygon points="270,235 306,214 306,248 270,269"/><polygon points="320,206 348,190 348,224 320,240"/>
+  <rect width="512" height="512" rx="112" fill="#0f0d13"/>
+  <g transform="translate(256 268) scale(1.3)" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-60" y="-110" width="120" height="220" rx="26" fill="none" stroke="#f5f3f7" stroke-width="16"/>
+    <path d="M-14 -66 L22 -46 L-14 -26 Z" fill="#ff4f8b" stroke="#ff4f8b" stroke-width="6"/>
+    <line x1="-28" y1="18" x2="28" y2="18" stroke="#f5f3f7" stroke-width="14"/>
+    <line x1="-28" y1="58" x2="28" y2="58" stroke="#f5f3f7" stroke-width="14"/>
+    <line x1="0" y1="-118" x2="0" y2="-144" stroke="#f5f3f7" stroke-width="14"/>
   </g>
-  <g fill="#ff8a94">
-    <polygon points="164,256 192,272 192,306 164,290"/><polygon points="206,280 242,301 242,335 206,314"/>
-    <polygon points="270,301 306,280 306,314 270,335"/><polygon points="320,272 348,256 348,290 320,306"/>
-  </g>
-  <g fill="#b39bff" opacity=".55">
-    <polygon points="164,322 192,338 192,372 164,356"/><polygon points="206,346 242,367 242,401 206,380"/>
-    <polygon points="270,367 306,346 306,380 270,401"/><polygon points="320,338 348,322 348,356 320,372"/>
-  </g>
-  <!-- estrella de Dirección -->
-  <polygon points="256,118 266,140 290,142 272,157 278,180 256,168 234,180 240,157 222,142 246,140" fill="#fff"/>
-  <polyline points="150,150 256,211 362,150" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="5" stroke-linejoin="round"/>
 </svg>

@@ -11,6 +11,7 @@ import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
 const PISOS = window.PISOS;
+await document.fonts.load("900 104px Unbounded").catch(() => {});
 const caja = document.getElementById("torre-caja");
 const capa = document.getElementById("rotulos");
 const aviso = document.getElementById("cargando3d");
@@ -408,7 +409,7 @@ const TECHO = ALTO;
   const borde = caja3(W + 0.1, 0.07, 0.07, neon(0xffb03b, 2.4), false); borde.position.set(0, TECHO, D / 2); escena.add(borde);
   const borde2 = caja3(0.07, 0.07, D + 0.1, neon(0xffb03b, 2.4), false); borde2.position.set(W / 2, TECHO, 0); escena.add(borde2);
   const t = textura(1024, 220, (g, w, h) => {
-    g.font = "170px 'Bebas Neue', Impact, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = "900 104px Unbounded, Impact, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
     g.shadowColor = "#ff4f8b"; g.shadowBlur = 26; g.fillStyle = "#ffe0ec"; g.fillText("CLIPS TOWER", w / 2, h / 2 + 8);
   });
   const letrero = new THREE.Group();

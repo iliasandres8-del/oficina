@@ -3,7 +3,7 @@
   "short_name": "Clips Tower",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0d0620",
+  "background_color": "#0f0d13",
   "theme_color": "#0d0620",
   "icons": [
     { "src": "icono-192.png", "sizes": "192x192", "type": "image/png" },
