@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Oficina de Agentes</title>
+<meta name="theme-color" content="#05060f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root {
+  --fondo: #05060f; --panel: #0c0e1c; --borde: #1d2140; --texto: #e8eaff; --suave: #8a90b8;
+  --azul: #3b6bff; --verde: #3ddc97; --rojo: #ff5470; --amarillo: #ffd23f;
+  --inclinar: 58deg; --girar: -40deg;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+html, body { background: var(--fondo); color: var(--texto); font-family: "Space Grotesk", system-ui, sans-serif; min-height: 100%; }
+body { overflow-x: hidden; }
+button { font: inherit; cursor: pointer; }
+
+/* ---------- distribución ---------- */
+.app { display: grid; grid-template-columns: 1fr 400px; min-height: 100vh; }
+.escena-caja { position: relative; overflow: hidden; min-height: 100vh;
+  background: radial-gradient(ellipse at 45% 45%, #0d1440 0%, #070a1f 45%, var(--fondo) 75%); }
+.lateral { border-left: 1px solid var(--borde); background: rgba(8, 10, 24, .92); display: flex; flex-direction: column; max-height: 100vh; }
+
+/* ---------- encabezado ---------- */
+.titulo { position: absolute; top: 18px; left: 20px; z-index: 5; }
+.titulo h1 { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+.titulo p { color: var(--suave); font-size: 13px; margin-top: 2px; }
+.contador { position: absolute; top: 18px; right: 20px; z-index: 5; display: flex; gap: 8px; }
+.ficha { background: rgba(12, 14, 32, .8); border: 1px solid var(--borde); border-radius: 12px; padding: 8px 12px; text-align: center; backdrop-filter: blur(6px); }
+.ficha b { display: block; font-size: 18px; }
+.ficha span { font-size: 11px; color: var(--suave); }
+
+/* ---------- la oficina isométrica ---------- */
+.escenario { position: absolute; left: 50%; top: 52%; width: 0; height: 0; }
+.piso { position: absolute; width: 960px; height: 520px; left: -480px; top: -260px;
+  transform-style: preserve-3d; transform: rotateX(var(--inclinar)) rotateZ(var(--girar));
+  background:
+    linear-gradient(rgba(59, 107, 255, .07) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, rgba(59, 107, 255, .07) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(135deg, #0b1235, #070b24);
+  border: 3px solid #2f55ff; border-radius: 6px;
+  box-shadow: 0 0 40px rgba(47, 85, 255, .55), inset 0 0 60px rgba(47, 85, 255, .18); }
+.sala { position: absolute; width: 180px; height: 180px; transform-style: preserve-3d; }
+.sala .suelo { position: absolute; inset: 0; background: var(--tinte); opacity: .28; border: 1px solid var(--linea); }
+.pared { position: absolute; background: linear-gradient(to top, var(--tinte), transparent); border: 1px solid var(--linea); opacity: .45; transition: opacity .4s, box-shadow .4s; }
+.p-atras { left: 0; top: 0; width: 180px; height: 78px; transform-origin: top; transform: rotateX(90deg); }
+.p-izq { left: 0; top: 0; width: 78px; height: 180px; transform-origin: left; transform: rotateY(-90deg);
+  background: linear-gradient(to left, var(--tinte), transparent); }
+.p-frente { left: 0; top: 180px; width: 180px; height: 78px; transform-origin: top; transform: rotateX(90deg); opacity: .16; }
+.p-der { left: 180px; top: 0; width: 78px; height: 180px; transform-origin: left; transform: rotateY(-90deg); opacity: .16;
+  background: linear-gradient(to left, var(--tinte), transparent); }
+.sala.trabajando .pared { opacity: .8; box-shadow: 0 0 30px var(--linea); }
+.sala.trabajando .suelo { opacity: .5; }
+.sala.error { --tinte: #ff5470; --linea: #ff8095; }
+
+/* objetos que miran a la cámara (deshacen el giro del piso) */
+.cara { position: absolute; left: 90px; top: 90px; transform-style: preserve-3d; }
+.cara > * { transform: rotateZ(calc(var(--girar) * -1)) rotateX(calc(var(--inclinar) * -1)); transform-origin: bottom center; }
+.etiqueta { position: absolute; left: 50%; bottom: 0; translate: -50% 0; white-space: nowrap;
+  background: rgba(8, 10, 26, .92); border: 1.5px solid var(--linea); border-radius: 999px;
+  padding: 7px 14px; font-weight: 600; font-size: 15px; display: flex; gap: 7px; align-items: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .5); }
+.etiqueta i { width: 8px; height: 8px; border-radius: 50%; background: var(--suave); }
+.sala.trabajando .etiqueta i { background: var(--verde); box-shadow: 0 0 10px var(--verde); animation: latir 1s infinite; }
+.sala.error .etiqueta i { background: var(--rojo); }
+.globo { position: absolute; left: 50%; bottom: 46px; translate: -50% 0; max-width: 220px; width: max-content;
+  background: #fff; color: #0a0c1d; border-radius: 10px; padding: 6px 10px; font-size: 12px; font-weight: 500;
+  opacity: 0; transition: opacity .3s; pointer-events: none; }
+.sala.trabajando .globo, .sala.error .globo { opacity: 1; }
+.agente { position: absolute; left: 50%; bottom: 0; translate: -50% 0; width: 60px; height: 64px; }
+.agente .pantalla { position: absolute; left: 6px; bottom: 26px; width: 34px; height: 22px; border-radius: 3px;
+  background: #11162f; border: 2px solid #c9d2ff; }
+.sala.trabajando .agente .pantalla { background: var(--linea); box-shadow: 0 0 14px var(--linea); animation: parpadeo .8s infinite alternate; }
+.agente .mesa { position: absolute; left: 0; bottom: 16px; width: 48px; height: 8px; background: #d6dcff; border-radius: 2px; }
+.agente .cabeza { position: absolute; right: 4px; bottom: 30px; width: 14px; height: 14px; border-radius: 50%; background: #f1f3ff; }
+.agente .cuerpo { position: absolute; right: 1px; bottom: 6px; width: 20px; height: 24px; border-radius: 9px 9px 4px 4px; background: var(--linea); }
+.sala.trabajando .agente .cabeza, .sala.trabajando .agente .cuerpo { animation: teclear .35s infinite alternate; }
+
+.paquete { position: absolute; width: 16px; height: 16px; border-radius: 4px; background: var(--amarillo);
+  box-shadow: 0 0 18px var(--amarillo); transition: left 1.4s cubic-bezier(.45, 0, .2, 1), top 1.4s cubic-bezier(.45, 0, .2, 1), opacity .4s;
+  transform: translateZ(20px); }
+.gema { position: absolute; width: 38px; height: 38px; background: linear-gradient(135deg, #2c3d8f, #121a47);
+  clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); opacity: .75; animation: flotar 7s ease-in-out infinite; }
+.chispa { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #fff; box-shadow: 0 0 8px #fff; animation: titilar 3s infinite; }
+
+@keyframes latir { 50% { opacity: .35; } }
+@keyframes parpadeo { to { filter: brightness(1.5); } }
+@keyframes teclear { to { transform: translateY(-2px); } }
+@keyframes flotar { 50% { transform: translateY(-14px) rotate(8deg); } }
+@keyframes titilar { 50% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---------- panel lateral ---------- */
+.pestanas { display: flex; gap: 4px; padding: 14px 14px 0; }
+.pestanas button { flex: 1; background: transparent; color: var(--suave); border: 1px solid var(--borde); border-radius: 10px; padding: 9px 6px; font-size: 13px; font-weight: 600; }
+.pestanas button[aria-selected="true"] { background: var(--azul); border-color: var(--azul); color: #fff; }
+.pestanas .num { background: var(--amarillo); color: #000; border-radius: 999px; padding: 0 6px; margin-left: 4px; font-size: 11px; }
+.vista { padding: 14px; overflow-y: auto; overflow-x: hidden; flex: 1; display: none; }
+.vista.activa { display: block; }
+.vacio { color: var(--suave); font-size: 14px; text-align: center; padding: 30px 10px; line-height: 1.5; }
+
+.nota { display: flex; gap: 10px; background: var(--panel); border: 1px solid var(--borde); border-radius: 14px; padding: 11px 12px; margin-bottom: 8px; }
+.nota .icono { width: 34px; height: 34px; border-radius: 9px; flex: none; display: grid; place-items: center; font-size: 16px; background: #182055; }
+.nota.ok .icono { background: #0f3b2c; } .nota.error .icono { background: #46121e; } .nota.aviso .icono { background: #46380c; }
+.nota b { font-size: 13px; display: block; } .nota p { font-size: 13px; color: #c8ccef; margin-top: 2px; line-height: 1.35; }
+.nota time { font-size: 11px; color: var(--suave); }
+.nota.nueva { animation: entrar .5s ease-out; }
+@keyframes entrar { from { transform: translateX(20px); opacity: 0; } }
+
+.tarjeta { background: var(--panel); border: 1px solid var(--borde); border-radius: 16px; overflow: hidden; margin-bottom: 14px; }
+.tarjeta video { width: 100%; aspect-ratio: 9 / 16; max-height: 60vh; background: #000; display: block; object-fit: contain; }
+.tarjeta .info { padding: 12px; }
+.tarjeta .gancho { font-weight: 700; font-size: 16px; }
+.tarjeta .meta { color: var(--suave); font-size: 12px; margin: 4px 0 8px; }
+.tarjeta .tit { font-size: 13px; color: #c8ccef; }
+.botones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.botones button { border: 0; border-radius: 10px; padding: 11px; font-weight: 700; }
+.si { background: var(--verde); color: #04140d; } .no { background: #262b52; color: var(--texto); }
+
+.fuente { display: flex; justify-content: space-between; align-items: center; background: var(--panel); border: 1px solid var(--borde); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 14px; }
+.fuente small { color: var(--suave); display: block; }
+.fuente button { background: transparent; border: 1px solid var(--borde); color: var(--suave); border-radius: 8px; padding: 6px 10px; font-size: 12px; }
+form.agregar { display: grid; gap: 8px; margin-top: 14px; }
+input, select { width: 100%; background: #0a0c1d; border: 1px solid var(--borde); color: var(--texto); border-radius: 10px; padding: 11px; font: inherit; font-size: 16px; }
+form button[type=submit], .entrar button { background: var(--azul); color: #fff; border: 0; border-radius: 10px; padding: 12px; font-weight: 700; }
+
+.entrar { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(3, 4, 12, .9); padding: 16px; }
+.entrar form { width: min(360px, 100%); display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--borde); border-radius: 18px; padding: 22px; }
+.entrar h2 { font-size: 19px; } .entrar p { color: var(--suave); font-size: 13px; }
+.error-txt { color: var(--rojo); font-size: 13px; min-height: 1em; }
+
+/* ---------- celular (va al final para ganarle a lo de arriba) ---------- */
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; min-height: 0; align-content: start; }
+  .escena-caja { min-height: 340px; height: 50vh; }
+  .escenario { top: 60%; left: 48%; }
+  .etiqueta { font-size: 30px; padding: 10px 20px; border-width: 2.5px; }
+  .globo { font-size: 24px; max-width: 380px; bottom: 74px; }
+  .gema { width: 24px; height: 24px; }
+  .lateral { border-left: 0; border-top: 1px solid var(--borde); max-height: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <section class="escena-caja" aria-label="Oficina de agentes">
+    <div class="titulo"><h1>Oficina de agentes</h1><p id="estado-equipo">Conectando…</p></div>
+    <div class="contador">
+      <div class="ficha"><b id="n-hoy">0/5</b><span>hoy</span></div>
+      <div class="ficha"><b id="n-ok">0</b><span>por aprobar</span></div>
+    </div>
+    <div class="escenario"><div class="piso" id="piso"></div></div>
+  </section>
+
+  <aside class="lateral">
+    <div class="pestanas" role="tablist">
+      <button role="tab" aria-selected="true" data-vista="aprobar">Tu OK <span class="num" id="badge" hidden>0</span></button>
+      <button role="tab" aria-selected="false" data-vista="notas">Actividad</button>
+      <button role="tab" aria-selected="false" data-vista="fuentes">Streamers</button>
+    </div>
+    <div class="vista activa" id="aprobar"></div>
+    <div class="vista" id="notas"></div>
+    <div class="vista" id="fuentes">
+      <div id="lista-fuentes"></div>
+      <form class="agregar" id="form-fuente">
+        <select name="plataforma"><option value="twitch">Twitch</option><option value="kick">Kick</option><option value="youtube">YouTube</option></select>
+        <input name="canal" placeholder="Canal (ej. ibai)" required autocomplete="off">
+        <input name="campana_url" placeholder="Link de la campaña en Whop (opcional)" autocomplete="off">
+        <button type="submit">Agregar streamer</button>
+      </form>
+    </div>
+  </aside>
+</div>
+
+<div class="entrar" id="entrar" hidden>
+  <form id="form-entrar">
+    <h2>Entra a tu oficina</h2>
+    <p>Con la misma cuenta de MI VIDA.</p>
+    <input type="email" name="email" placeholder="Correo" autocomplete="username" required>
+    <input type="password" name="clave" placeholder="Contraseña" autocomplete="current-password" required>
+    <div class="error-txt" id="error-entrar"></div>
+    <button type="submit">Entrar</button>
+  </form>
+</div>
+
+<script>
+const db = supabase.createClient("https://qzszwuiehdjndzqfbvsw.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6c3p3dWllaGRqbmR6cWZidnN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NzE2MTksImV4cCI6MjEwNTA0NzYxOX0.Suzr4M3EDhczpR_xeH28OomKhrYmNPZA7NABR3nLEdA");
+
+// Salas: posición en el piso (x, y), color e icono. El orden sigue la cadena de trabajo.
+const SALAS = {
+  radar:      { x: 30,  y: 40,  tinte: "#2a7bff", linea: "#5aa0ff", icono: "📡" },
+  cortador:   { x: 260, y: 40,  tinte: "#18b6c9", linea: "#4fe3f0", icono: "✂️" },
+  copywriter: { x: 490, y: 40,  tinte: "#7a5cff", linea: "#a690ff", icono: "✍️" },
+  editor:     { x: 720, y: 40,  tinte: "#2fbf71", linea: "#62f0a3", icono: "🎬" },
+  revisor:    { x: 720, y: 290, tinte: "#e0a21b", linea: "#ffd23f", icono: "🔍" },
+  publicador: { x: 490, y: 290, tinte: "#ff4f8b", linea: "#ff86b0", icono: "🚀" },
+  biblioteca: { x: 260, y: 290, tinte: "#8b93b8", linea: "#c9d2ff", icono: "🗂️" },
+  analista:   { x: 30,  y: 290, tinte: "#3b6bff", linea: "#8aa6ff", icono: "📊" },
+};
+const SIGUIENTE = { radar: "cortador", cortador: "copywriter", copywriter: "editor", editor: "revisor", revisor: "publicador", publicador: "biblioteca" };
+const ICONO_NOTA = { ok: "✅", error: "⚠️", aviso: "💡", info: "📡" };
+const $ = (s) => document.querySelector(s);
+const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let agentes = {}, clipsOk = [], meta = 5;
+
+// ---------- construir la oficina ----------
+function construir() {
+  const piso = $("#piso");
+  for (const [id, s] of Object.entries(SALAS)) {
+    const d = document.createElement("div");
+    d.className = "sala"; d.id = "sala-" + id;
+    d.style.cssText = `left:${s.x}px;top:${s.y}px;--tinte:${s.tinte};--linea:${s.linea}`;
+    d.innerHTML = `<div class="suelo"></div><div class="pared p-atras"></div><div class="pared p-izq"></div>
+      <div class="cara"><div class="agente"><div class="mesa"></div><div class="pantalla"></div><div class="cuerpo"></div><div class="cabeza"></div></div></div>
+      <div class="pared p-frente"></div><div class="pared p-der"></div>
+      <div class="cara" style="transform:translateZ(120px)"><div><div class="etiqueta"><i></i><span>${s.icono} <span class="nombre">${id}</span></span></div><div class="globo"></div></div></div>`;
+    piso.appendChild(d);
+  }
+  for (let i = 0; i < 26; i++) {
+    const c = document.createElement("div"); c.className = "chispa";
+    c.style.cssText = `left:${Math.random() * 940}px;top:${Math.random() * 500}px;animation-delay:${Math.random() * 3}s`;
+    piso.appendChild(c);
+  }
+  const caja = $(".escena-caja");
+  [[8, 70], [18, 22], [80, 78], [88, 30], [55, 88], [40, 12]].forEach(([x, y], i) => {
+    const g = document.createElement("div"); g.className = "gema";
+    g.style.cssText = `left:${x}%;top:${y}%;animation-delay:${i * 1.1}s`;
+    caja.appendChild(g);
+  });
+  ajustar(); addEventListener("resize", ajustar);
+}
+function ajustar() {
+  const caja = $(".escena-caja"), esc = Math.min(caja.clientWidth / 1060, caja.clientHeight / 700, 1.15);
+  $(".escenario").style.transform = `scale(${Math.max(esc, .3)})`;
+}
+
+function pintarAgente(a) {
+  agentes[a.id] = a;
+  const sala = $("#sala-" + a.id); if (!sala) return;
+  sala.classList.toggle("trabajando", a.estado === "trabajando");
+  sala.classList.toggle("error", a.estado === "error");
+  sala.querySelector(".nombre").textContent = a.nombre;
+  sala.querySelector(".globo").textContent = a.tarea || (a.estado === "error" ? "Algo falló" : "");
+  const n = Object.values(agentes).filter((x) => x.estado === "trabajando").length;
+  $("#estado-equipo").textContent = n ? `${n} agente${n > 1 ? "s" : ""} trabajando` : "Equipo libre · esperando la próxima vuelta";
+}
+
+function enviarPaquete(desde) {
+  const a = SALAS[desde], b = SALAS[SIGUIENTE[desde]]; if (!a || !b) return;
+  const p = document.createElement("div"); p.className = "paquete";
+  p.style.left = a.x + 82 + "px"; p.style.top = a.y + 82 + "px";
+  $("#piso").appendChild(p);
+  requestAnimationFrame(() => requestAnimationFrame(() => { p.style.left = b.x + 82 + "px"; p.style.top = b.y + 82 + "px"; }));
+  setTimeout(() => { p.style.opacity = 0; setTimeout(() => p.remove(), 500); }, 1500);
+}
+
+// ---------- notificaciones ----------
+function hace(f) {
+  const s = (Date.now() - new Date(f)) / 1000;
+  if (s < 60) return "ahora"; if (s < 3600) return `hace ${Math.floor(s / 60)} min`;
+  if (s < 86400) return `hace ${Math.floor(s / 3600)} h`; return new Date(f).toLocaleDateString("es-CO");
+}
+function nota(e, nueva) {
+  const d = document.createElement("div");
+  d.className = `nota ${e.tipo}${nueva ? " nueva" : ""}`;
+  d.innerHTML = `<div class="icono">${ICONO_NOTA[e.tipo] || "📡"}</div><div><b>${esc(agentes[e.agente]?.nombre || e.agente || "Oficina")}</b><p>${esc(e.mensaje)}</p><time>${hace(e.creado)}</time></div>`;
+  const lista = $("#notas"); lista.querySelector(".vacio")?.remove();
+  nueva ? lista.prepend(d) : lista.append(d);
+}
+
+// ---------- aprobar ----------
+async function pintarAprobar() {
+  const v = $("#aprobar");
+  $("#n-ok").textContent = clipsOk.length;
+  const badge = $("#badge"); badge.hidden = !clipsOk.length; badge.textContent = clipsOk.length;
+  if (!clipsOk.length) { v.innerHTML = `<p class="vacio">Nada esperando tu OK.<br>Cuando el Revisor apruebe un clip, aparece aquí para que lo veas antes de publicarlo.</p>`; return; }
+  v.innerHTML = "";
+  for (const c of clipsOk) {
+    const t = document.createElement("article"); t.className = "tarjeta";
+    let src = "";
+    if (c.preview_path) {
+      const { data } = await db.storage.from("oficina").createSignedUrl(c.preview_path, 3600);
+      src = data?.signedUrl || "";
+    }
+    t.innerHTML = `${src ? `<video src="${esc(src)}" controls playsinline preload="metadata"></video>` : ""}
+      <div class="info"><div class="gancho">${esc(c.copy?.gancho)}</div>
+      <div class="meta">${esc(c.streamer)} · ${esc(c.vistas_origen)} vistas en el original · ${Math.round(c.revision?.duracion || c.duracion || 0)} s</div>
+      <div class="tit">${esc(c.copy?.titulo)}</div>
+      <div class="botones"><button class="no" data-id="${c.id}" data-d="descartado">Descartar</button><button class="si" data-id="${c.id}" data-d="aprobado">Aprobar</button></div></div>`;
+    v.appendChild(t);
+  }
+}
+$("#aprobar").addEventListener("click", async (ev) => {
+  const b = ev.target.closest("button[data-id]"); if (!b) return;
+  b.disabled = true;
+  const { error } = await db.from("of_clips").update({ estado: b.dataset.d }).eq("id", b.dataset.id);
+  if (error) { alert(error.message); b.disabled = false; return; }
+  clipsOk = clipsOk.filter((c) => c.id !== b.dataset.id); pintarAprobar();
+});
+
+// ---------- streamers ----------
+async function cargarFuentes() {
+  const { data } = await db.from("of_fuentes").select("*").order("id");
+  const l = $("#lista-fuentes");
+  l.innerHTML = (data || []).length ? "" : `<p class="vacio">Agrega los streamers de GTA 6 que tengan campaña de clipping.</p>`;
+  for (const f of data || []) {
+    const d = document.createElement("div"); d.className = "fuente";
+    d.innerHTML = `<div>${esc(f.canal)}<small>${esc(f.plataforma)}${f.campana_url ? " · con campaña" : ""}${f.notas ? " · " + esc(f.notas) : ""}</small></div>
+      <button data-f="${f.id}" data-a="${!f.activa}">${f.activa ? "Pausar" : "Activar"}</button>`;
+    l.appendChild(d);
+  }
+}
+$("#lista-fuentes").addEventListener("click", async (ev) => {
+  const b = ev.target.closest("button[data-f]"); if (!b) return;
+  await db.from("of_fuentes").update({ activa: b.dataset.a === "true" }).eq("id", b.dataset.f); cargarFuentes();
+});
+$("#form-fuente").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = new FormData(ev.target);
+  const { error } = await db.from("of_fuentes").insert({ plataforma: f.get("plataforma"), canal: f.get("canal").trim().replace(/^@/, "").toLowerCase(), campana_url: f.get("campana_url") || null });
+  if (error) return alert(error.message);
+  ev.target.reset(); cargarFuentes();
+});
+
+// ---------- pestañas ----------
+document.querySelectorAll("[role=tab]").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("[role=tab]").forEach((x) => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll(".vista").forEach((v) => v.classList.toggle("activa", v.id === b.dataset.vista));
+}));
+
+// ---------- datos en vivo ----------
+async function contarHoy() {
+  const desde = new Date(Date.now() - 86400000).toISOString();
+  const { count } = await db.from("of_clips").select("id", { count: "exact", head: true })
+    .in("estado", ["esperando_ok", "aprobado", "publicado"]).gte("creado", desde);
+  $("#n-hoy").textContent = `${count || 0}/${meta}`;
+}
+async function iniciar() {
+  const [{ data: ag }, { data: ev }, { data: ok }] = await Promise.all([
+    db.from("of_agentes").select("*").order("orden"),
+    db.from("of_eventos").select("*").order("id", { ascending: false }).limit(40),
+    db.from("of_clips").select("*").eq("estado", "esperando_ok").order("creado"),
+  ]);
+  (ag || []).forEach(pintarAgente);
+  $("#notas").innerHTML = (ev || []).length ? "" : `<p class="vacio">Todavía no hay actividad.</p>`;
+  (ev || []).forEach((e) => nota(e, false));
+  clipsOk = ok || []; pintarAprobar(); cargarFuentes(); contarHoy();
+  db.channel("oficina")
+    .on("postgres_changes", { event: "*", schema: "public", table: "of_agentes" }, (p) => p.new?.id && pintarAgente(p.new))
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "of_eventos" }, (p) => {
+      nota(p.new, true);
+      if (p.new.tipo === "ok" && p.new.agente) enviarPaquete(p.new.agente);
+    })
+    .on("postgres_changes", { event: "UPDATE", schema: "public", table: "of_clips" }, (p) => {
+      const c = p.new, esta = clipsOk.some((x) => x.id === c.id);
+      if (c.estado === "esperando_ok" && !esta) { clipsOk.push(c); pintarAprobar(); }
+      if (c.estado !== "esperando_ok" && esta) { clipsOk = clipsOk.filter((x) => x.id !== c.id); pintarAprobar(); }
+      contarHoy();
+    })
+    .subscribe();
+  setInterval(() => document.querySelectorAll(".nota time").forEach(() => {}), 60000);
+}
+
+// ---------- sesión ----------
+$("#form-entrar").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const f = new FormData(ev.target);
+  const { error } = await db.auth.signInWithPassword({ email: f.get("email"), password: f.get("clave") });
+  if (error) { $("#error-entrar").textContent = "No pude entrar: revisa el correo y la contraseña."; return; }
+  $("#entrar").hidden = true; iniciar();
+});
+
+construir();
+db.auth.getSession().then(({ data }) => {
+  if (data.session) iniciar(); else $("#entrar").hidden = false;
+});
+</script>
+</body>
+</html>
