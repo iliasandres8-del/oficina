@@ -238,7 +238,7 @@ input::placeholder, textarea::placeholder { color: var(--tenue); }
   <section class="vista" id="streamers" aria-label="Streamers">
     <div class="contenido">
       <h2 class="titulo-vista">STREAMERS</h2>
-      <p class="sub-vista">De aquí sale el material. Pon los que tengan campaña de clipping de GTA 6.</p>
+      <p class="sub-vista">De aquí sale el material. Pon los streamers que tengan campaña de clipping.</p>
       <div class="lista" id="lista-fuentes"></div>
       <form class="agregar" id="form-fuente">
         <h3>Agregar streamer</h3>
@@ -279,7 +279,7 @@ input::placeholder, textarea::placeholder { color: var(--tenue); }
 <form class="hoja" id="hoja-cambios" hidden role="dialog" aria-label="Pedir cambios">
   <div class="asa"></div><h3>PEDIR CAMBIOS</h3>
   <p class="sub-vista">Dile al equipo qué cambiar del texto (gancho, título, descripción). Rehacen el video y vuelve a tu mesa.</p>
-  <textarea name="nota" maxlength="500" required placeholder="Ej: el gancho más corto y con más misterio, y menciona que es GTA 6"></textarea>
+  <textarea name="nota" maxlength="500" required placeholder="Ej: el gancho más corto y con más misterio, y menciona al streamer"></textarea>
   <div class="error-txt" id="error-cambios"></div>
   <button class="boton" type="submit">Enviar al equipo</button>
 </form>
@@ -458,7 +458,7 @@ $("#hoja-cambios").addEventListener("submit", async (e) => {
 async function cargarFuentes() {
   const { data } = await db.from("of_fuentes").select("*").order("id");
   const l = $("#lista-fuentes");
-  l.innerHTML = (data || []).length ? "" : `<div class="vacio"><span class="grande">🎮</span><b>Sin streamers todavía</b>Agrega los streamers de GTA 6 que tengan campaña de clipping.</div>`;
+  l.innerHTML = (data || []).length ? "" : `<div class="vacio"><span class="grande">🎮</span><b>Sin streamers todavía</b>Agrega los streamers que tengan campaña de clipping.</div>`;
   for (const f of data || []) {
     const d = document.createElement("div"); d.className = "fuente" + (f.activa ? "" : " pausa");
     d.innerHTML = `<div class="avatar">${esc((f.canal || "?")[0].toUpperCase())}</div><div class="datos">${esc(f.canal)}<small>${f.activa ? "" : "pausado · "}${esc(f.plataforma)}${f.campana_url ? " · con campaña" : ""}</small></div>
