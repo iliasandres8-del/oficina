@@ -242,7 +242,8 @@ input::placeholder, textarea::placeholder { color: var(--tenue); }
       <div class="lista" id="lista-fuentes"></div>
       <form class="agregar" id="form-fuente">
         <h3>Agregar streamer</h3>
-        <select name="plataforma" aria-label="Plataforma"><option value="twitch">Twitch</option><option value="kick">Kick</option><option value="youtube">YouTube</option></select>
+        <select name="cuenta" id="sel-cuenta" aria-label="Cuenta donde se publica"><option value="es">🇪🇸 Clips Tower</option><option value="en">🇺🇸 Cuenta en inglés</option></select>
+        <select name="plataforma" aria-label="Plataforma"><option value="twitch">Twitch (clips)</option><option value="kick">Kick (clips)</option><option value="youtube">YouTube (shorts)</option><option value="youtube_directos">YouTube (directos largos)</option></select>
         <input name="canal" placeholder="Canal (ej. ibai)" aria-label="Canal" required autocomplete="off">
         <input name="campana_url" placeholder="Link de la campaña en Whop (opcional)" aria-label="Link de la campaña" autocomplete="off">
         <button class="boton" type="submit">Agregar</button>
@@ -383,7 +384,7 @@ async function pintarDirector() {
   const [c, siguiente] = clipsOk;
   const src = await urlDe(c);
   torre("jefe", n, { gancho: c.copy?.gancho, streamer: c.streamer, url: src });
-  const datos = [c.streamer, `${Number(c.vistas_origen || 0).toLocaleString("es-CO")} vistas`, `${Math.round(c.revision?.duracion || c.duracion || 0)} s`].filter(Boolean);
+  const datos = [BANDERA[c.cuenta] || "", c.streamer, `${Number(c.vistas_origen || 0).toLocaleString("es-CO")} vistas`, `${Math.round(c.revision?.duracion || c.duracion || 0)} s`].filter(Boolean);
   const cp = c.copy || {};
   cuerpo.innerHTML = `
     <div class="pila">
@@ -455,13 +456,19 @@ $("#hoja-cambios").addEventListener("submit", async (e) => {
 });
 
 // ---------- streamers ----------
+const BANDERA = { es: "🇪🇸", en: "🇺🇸" };
+const PLATAFORMA = { twitch: "Twitch", kick: "Kick", youtube: "YouTube shorts", youtube_directos: "YouTube directos" };
 async function cargarFuentes() {
-  const { data } = await db.from("of_fuentes").select("*").order("id");
+  const [{ data }, { data: cuentas }] = await Promise.all([
+    db.from("of_fuentes").select("*").order("cuenta").order("id"),
+    db.from("of_cuentas").select("*").order("orden"),
+  ]);
+  if (cuentas?.length) $("#sel-cuenta").innerHTML = cuentas.map((k) => `<option value="${esc(k.id)}">${BANDERA[k.idioma] || ""} ${esc(k.nombre)}</option>`).join("");
   const l = $("#lista-fuentes");
   l.innerHTML = (data || []).length ? "" : `<div class="vacio"><span class="grande">🎮</span><b>Sin streamers todavía</b>Agrega los streamers que tengan campaña de clipping.</div>`;
   for (const f of data || []) {
     const d = document.createElement("div"); d.className = "fuente" + (f.activa ? "" : " pausa");
-    d.innerHTML = `<div class="avatar">${esc((f.canal || "?")[0].toUpperCase())}</div><div class="datos">${esc(f.canal)}<small>${f.activa ? "" : "pausado · "}${esc(f.plataforma)}${f.campana_url ? " · con campaña" : ""}</small></div>
+    d.innerHTML = `<div class="avatar">${esc((f.canal || "?")[0].toUpperCase())}</div><div class="datos">${esc(f.canal)}<small>${BANDERA[f.cuenta] || ""} ${f.activa ? "" : "pausado · "}${esc(PLATAFORMA[f.plataforma] || f.plataforma)}${f.campana_url ? " · con campaña" : ""}</small></div>
       <button type="button" data-f="${f.id}" data-a="${!f.activa}">${f.activa ? "Pausar" : "Activar"}</button>`;
     l.appendChild(d);
   }
@@ -473,7 +480,7 @@ $("#lista-fuentes").addEventListener("click", async (e) => {
 $("#form-fuente").addEventListener("submit", async (e) => {
   e.preventDefault();
   const f = new FormData(e.target);
-  const { error } = await db.from("of_fuentes").insert({ plataforma: f.get("plataforma"), canal: f.get("canal").trim().replace(/^@/, "").toLowerCase(), campana_url: f.get("campana_url") || null });
+  const { error } = await db.from("of_fuentes").insert({ cuenta: f.get("cuenta"), plataforma: f.get("plataforma"), canal: f.get("canal").trim().replace(/^@/, "").toLowerCase(), campana_url: f.get("campana_url") || null });
   if (error) return alert(error.message);
   e.target.reset(); cargarFuentes();
 });
