@@ -118,10 +118,18 @@ main { padding-bottom: calc(var(--barra) + env(safe-area-inset-bottom)); }
 .pista { position: absolute; top: 10px; left: 50%; translate: -50% 0; z-index: 3; font-size: 11px; color: var(--suave); background: rgba(13, 6, 32, .6); padding: 4px 10px; border-radius: 999px; pointer-events: none; white-space: nowrap; transition: opacity .6s; }
 
 /* ---------- Director ---------- */
-.pila { position: relative; height: min(62dvh, 560px); margin: 4px auto 0; max-width: 380px; }
+.pila { position: relative; height: min(64dvh, 640px); aspect-ratio: 9 / 16; max-width: 100%; margin: 4px auto 0; }
+/* visor a pantalla completa para revisar bien antes de aprobar */
+.visor { position: fixed; inset: 0; z-index: 80; background: #000; display: flex; flex-direction: column; }
+.visor[hidden] { display: none; }
+.visor video { flex: 1; width: 100%; min-height: 0; object-fit: contain; background: #000; }
+.visor .cerrar { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; z-index: 2; width: 44px; height: 44px; border-radius: 50%; background: rgba(0, 0, 0, .6); color: #fff; font-size: 20px; }
+.visor .gancho-visor { position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; right: 66px; z-index: 2; font-size: 13px; color: rgba(255, 255, 255, .8); pointer-events: none; }
+.visor .barra { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); background: #0b0712; border-top: 1px solid var(--borde); }
 .carta { position: absolute; inset: 0; border-radius: 26px; overflow: hidden; background: #000; box-shadow: 0 24px 50px rgba(0, 0, 0, .55); touch-action: pan-y; user-select: none; will-change: transform; }
 .carta.atras { transform: scale(.94) translateY(14px); opacity: .55; pointer-events: none; }
-.carta video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.carta video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.carta .botones-arriba { display: flex; gap: 8px; }
 .carta .sin-video { position: absolute; inset: 0; background: linear-gradient(160deg, #ff8a3d, #d6336c 45%, #3b1366); }
 .carta .sombra { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, .35), transparent 22%, transparent 55%, rgba(0, 0, 0, .85)); pointer-events: none; }
 .carta .arriba { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; }
@@ -392,7 +400,7 @@ async function pintarDirector() {
       <article class="carta" id="carta" data-id="${c.id}">
         ${src ? `<video src="${esc(src)}" autoplay muted loop playsinline preload="auto"></video>` : `<div class="sin-video"></div>`}
         <div class="sombra"></div>
-        <div class="arriba"><span class="pastilla">1 de ${n}</span>${src ? `<button class="sonido" id="sonido" type="button" aria-label="Activar sonido">🔇</button>` : ""}</div>
+        <div class="arriba"><span class="pastilla">1 de ${n}</span>${src ? `<span class="botones-arriba"><button class="sonido" id="sonido" type="button" aria-label="Activar sonido">🔇</button><button class="sonido" id="ampliar" type="button" aria-label="Ver en pantalla completa">⛶</button></span>` : ""}</div>
         <div class="sello si">APROBADO</div><div class="sello no">DESCARTADO</div>
         <div class="abajo"><div class="gancho">${esc(cp.gancho || c.titulo_origen)}</div><div class="datos">${datos.map((d) => `<span>${esc(d)}</span>`).join("")}</div></div>
       </article>
@@ -402,7 +410,7 @@ async function pintarDirector() {
       <button class="cambios-btn" type="button" id="btn-cambios">↺ Pedir cambios</button>
       <button class="redondo si" type="button" data-d="aprobado" aria-label="Aprobar">✓</button>
     </div>
-    <p class="ayuda">Desliza a la derecha para aprobar, a la izquierda para descartar</p>
+    <p class="ayuda">Toca el video para verlo en pantalla completa · Desliza a la derecha para aprobar, a la izquierda para descartar</p>
     <details class="textos"><summary>Ver los textos para las redes</summary>
       <h4>TÍTULO</h4><p>${esc(cp.titulo)}</p>
       <h4>DESCRIPCIÓN</h4><p>${esc(cp.descripcion)}</p>
@@ -410,10 +418,45 @@ async function pintarDirector() {
     </details>`;
   activarCarta();
 }
+// ---------- visor a pantalla completa ----------
+function abrirVisor(src, gancho) {
+  if (!src) return;
+  let v = $("#visor");
+  if (!v) {
+    v = document.createElement("div"); v.id = "visor"; v.className = "visor"; v.setAttribute("role", "dialog"); v.setAttribute("aria-label", "Video en pantalla completa");
+    v.innerHTML = `<video playsinline controls preload="auto"></video><div class="gancho-visor"></div>
+      <button class="cerrar" type="button" aria-label="Cerrar">✕</button>
+      <div class="barra"><button class="redondo no" type="button" data-v="descartado" aria-label="Descartar">✕</button>
+        <button class="cambios-btn" type="button" data-v="cambios">↺ Pedir cambios</button>
+        <button class="redondo si" type="button" data-v="aprobado" aria-label="Aprobar">✓</button></div>`;
+    document.body.appendChild(v);
+    v.querySelector(".cerrar").addEventListener("click", cerrarVisor);
+    v.querySelectorAll("[data-v]").forEach((b) => b.addEventListener("click", async () => {
+      const d = b.dataset.v; cerrarVisor();
+      if (d === "cambios") { $("#error-cambios").textContent = ""; abrirHoja($("#hoja-cambios")); $("#hoja-cambios textarea").focus(); }
+      else decidir(d);
+    }));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#visor").hidden) cerrarVisor(); });
+  }
+  const vid = v.querySelector("video");
+  v.querySelector(".gancho-visor").textContent = gancho || "";
+  vid.src = src; vid.muted = false; vid.currentTime = 0;
+  v.hidden = false;
+  document.querySelectorAll(".carta video").forEach((x) => x.pause());
+  vid.play().catch(() => { vid.muted = true; vid.play().catch(() => {}); });
+  (v.requestFullscreen || v.webkitRequestFullscreen)?.call(v).catch?.(() => {});
+}
+function cerrarVisor() {
+  const v = $("#visor"); if (!v) return;
+  v.querySelector("video").pause(); v.hidden = true;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  document.querySelectorAll(".carta video").forEach((x) => x.play().catch(() => {}));
+}
 function activarCarta() {
   const carta = $("#carta"); if (!carta) return;
   const video = carta.querySelector("video");
   $("#sonido")?.addEventListener("click", (e) => { e.stopPropagation(); video.muted = !video.muted; e.currentTarget.textContent = video.muted ? "🔇" : "🔊"; });
+  $("#ampliar")?.addEventListener("click", (e) => { e.stopPropagation(); abrirVisor(video?.currentSrc || video?.src, carta.querySelector(".gancho")?.textContent); });
   let x0 = null, dx = 0;
   carta.addEventListener("pointerdown", (e) => { if (e.target.closest("button")) return; x0 = e.clientX; dx = 0; carta.setPointerCapture(e.pointerId); carta.style.transition = "none"; });
   carta.addEventListener("pointermove", (e) => {
@@ -425,6 +468,7 @@ function activarCarta() {
   const soltar = () => {
     if (x0 === null) return; x0 = null;
     if (Math.abs(dx) > 110) return decidir(dx > 0 ? "aprobado" : "descartado");
+    if (Math.abs(dx) < 6 && video) { abrirVisor(video.currentSrc || video.src, carta.querySelector(".gancho")?.textContent); }
     carta.style.transition = "transform .25s"; carta.style.transform = "";
     carta.querySelectorAll(".sello").forEach((s) => (s.style.opacity = 0));
   };
