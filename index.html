@@ -311,7 +311,7 @@ const db = supabase.createClient("https://qzszwuiehdjndzqfbvsw.supabase.co",
 
 // Los pisos de la torre, de abajo hacia arriba. Cada agente trabaja en su piso.
 const PISOS = [
-  { id: "busqueda",   nombre: "Búsqueda",   icono: "📡", color: "#ffd23f", agentes: ["radar", "biblioteca"] },
+  { id: "busqueda",   nombre: "Búsqueda",   icono: "📡", color: "#ffd23f", agentes: ["radar", "nicho"] },
   { id: "guion",      nombre: "Guion y corte", icono: "✍️", color: "#ff8a94", agentes: ["cortador", "copywriter"] },
   { id: "edicion",    nombre: "Edición",    icono: "🎬", color: "#ff4f8b", agentes: ["editor", "revisor"] },
   { id: "publicacion", nombre: "Publicación", icono: "🚀", color: "#b39bff", agentes: ["publicador", "analista"] },
@@ -319,7 +319,7 @@ const PISOS = [
 ];
 window.PISOS = PISOS;
 // Orden de la cadena: el Revisor le entrega al Director; lo aprobado baja al Publicador.
-const SIGUIENTE = { radar: "cortador", cortador: "copywriter", copywriter: "editor", editor: "revisor", revisor: "director", publicador: "biblioteca" };
+const SIGUIENTE = { radar: "cortador", cortador: "copywriter", copywriter: "editor", editor: "revisor", revisor: "director", publicador: "nicho" };
 const ICONO = { ok: "✅", error: "⚠️", aviso: "💡", info: "📡" };
 const $ = (s) => document.querySelector(s);
 const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));

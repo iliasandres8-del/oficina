@@ -317,7 +317,7 @@ function puesto({ color, director = false, planta = false }) {
 
 const EQUIPO = {
   radar:      { modelo: "H", traje: 0x2e3a5c, corbata: 0xffb000, piel: 0xf1c27d, pelo: 0x1b1b1b },
-  biblioteca: { modelo: "M", traje: 0x2c3a66, piel: 0x8d5524, pelo: 0x1b1b1b },
+  nicho:      { modelo: "M", traje: 0x2c3a66, piel: 0x8d5524, pelo: 0x1b1b1b },
   cortador:   { modelo: "M", traje: 0x5a2340, piel: 0x8d5524, pelo: 0x141414 },
   copywriter: { modelo: "M", traje: 0xa8744a, piel: 0xffdbac, pelo: 0x8a3f1d },
   editor:     { modelo: "H", traje: 0x3b3b46, corbata: 0xff3d8b, piel: 0xc68642, pelo: 0x2a1a12 },
@@ -330,7 +330,7 @@ const EQUIPO = {
 };
 
 // nombres que se ven en las placas
-const NOMBRES = { radar: "Radar", biblioteca: "Biblioteca", cortador: "Cortador", copywriter: "Copywriter", editor: "Editor", revisor: "Revisor",
+const NOMBRES = { radar: "Radar", nicho: "Nicho", cortador: "Cortador", copywriter: "Copywriter", editor: "Editor", revisor: "Revisor",
   publicador: "Publicador", analista: "Analista", director: "Andrés", admin: "Yareidys" };
 
 // ---------- los pisos ----------
